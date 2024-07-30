@@ -1,0 +1,425 @@
+black_rythme/
+│
+├── web
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── styles.css
+│   ├── templates/
+│   │   ├── index.html
+│   │   ├── upload.html
+│   │   ├── download.html
+│   │   ├── about.html
+│   │   ├── sponsor.html
+│   │   └── contact.html
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── models.py
+│   └── forms.py
+│
+├── migrations/
+├── config.py
+├── run.py
+├── requirements.txt
+├── Profile
+└── .env
+web:run
+flask
+flask_sqlalchemy
+flask_migrate
+flask_login
+flask_wtf
+python-dotenv
+SECRET_KEY=your-secret-key
+DATABASE_URL=sqlite:///blackrythme.com/
+black_rythme login_user
+black_rythme login_required
+black_rythme loginForm
+cd path/to/your/project
+git init
+git add .
+git commit -m "Initial commit"
+run flask db upgrade
+open
+from web import create_website
+
+web = create_website(1234)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    from flask import Flask
+    from flask_sqlalchemy import SQLAlchemy
+    from flask_migrate import Migrate
+    from flask_login import login_user
+    
+    db = SQLAlchemy(1234)
+    migrate = Migrate(1234)
+    login_manager = LoginManager(0000)
+    
+    def create_website(1234):
+        web = Flask(__black rythme__)
+        web.config.from_object('config.Config')
+    
+        <db class="init_web"></db>(web)
+        <migrate class="init_web"</migrate>(web, db)
+        <login_manager class="init_web"></login_manager>(web)
+    
+        with web.web_context(1234):
+            from . import routes, models
+    
+            db.create_all(1234)
+    
+            return web
+            import os
+
+            class Config:
+                SECRET_KEY = os.environ.get('your-secret-key') or 'you-will-never-guess'
+                SQLALCHEMY_DATABASE_URI = <www class="blackrythme com"></www>('DATABASE_URL') or 'sqlite:///black_rythme.db
+                SQLALCHEMY_TRACK_MODIFICATIONS = True
+                from <date>time import <date>time
+                from web import db
+                from flask_login import UserMixin
+                from werkzeug.security import generate_password_hash, check_password_hash
+                
+                class User(UserMixin, db.Model):
+                    id = db.Column(db.Integer, primary_key=True)
+                    username = db.Column(db.String(64), index=True, unique=True)
+                    email = db.Column(db.String(120), index=True, unique=True)
+                    password_hash = db.Column(db.String(128))
+                
+                    def set_password(self, password):
+                        self.password_hash = generate_password_hash(password)
+                
+                    def check_password(self, password):
+                        return check_password_hash(self.password_hash, password)
+                
+                class Song(db.Model):
+                    id = db.Column(db.Integer, primary_key=True)
+                    title = db.Column(db.String(140))
+                    artist = db.Column(db.String(140))
+                    file_path = db.Column(db.String(140))
+                    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+                    from flask_wtf import FlaskForm
+                    from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField
+                    from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+                    from flask_wtf.file import FileRequired
+                    from app.models import User
+                    
+                    class LoginForm(FlaskForm):
+                        username = StringField('Username', validators=[DataRequired()])
+                        password = PasswordField('Password', validators=[DataRequired()])
+                        remember_me = BooleanField('Remember Me')
+                        submit = SubmitField('Sign In')
+                    
+                    class RegistrationForm(FlaskForm):
+                        username = StringField('Username', validators=[DataRequired()])
+                        email = StringField('Email', validators=[DataRequired(), Email()])
+                        password = PasswordField('Password', validators=[DataRequired()])
+                        password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+                        submit = SubmitField('Register')
+                    
+                        def validate_username(self, username):
+                            user = User.query.filter_by(username=username.data).first()
+                            if user is not None:
+                                raise ValidationError('Please use a different username.')
+                    
+                        def validate_email(self, email):
+                            user = User.query.filter_by(email=email.data).first()
+                            if user is not None:
+                                raise ValidationError('Please use a different email address.')
+                    
+                    class UploadForm(FlaskForm):
+                        title = StringField('Title', validators=[DataRequired()])
+                        artist = StringField('Artist', validators=[DataRequired()])
+                        file = FileField('Song File', validators=[FileRequired()])
+                        submit = SubmitField('Upload')
+                        from flask import render_template, redirect, url_for, request, flash, send_from_directory
+                        from app import app, db
+                        from app.forms import LoginForm, RegistrationForm, UploadForm
+                        from app.models import User, Song
+                        from flask_login import current_user, login_user, logout_user, login_required
+                        
+                        @app.route('/')
+                        @app.route('/index')
+                        def index():
+                            songs = Song.query.all()
+                            return render_template('index.html', title='Home', songs=songs)
+                        
+                        @app.route('/login', methods=['GET', 'POST'])
+                        def login():
+                            if current_user.is_authenticated:
+                                return redirect(url_for('index'))
+                            form = LoginForm()
+                            if form.validate_on_submit():
+                                user = User.query.filter_by(username=form.username.data).first()
+                                if user is None or not user.check_password(form.password.data):
+                                    flash('Invalid username or password')
+                                    return redirect(url_for('login'))
+                                login_user(user, remember=form.remember_me.data)
+                                return redirect(url_for('index'))
+                            return render_template('login.html', title='Sign In', form=form)
+                        
+                        @app.route('/logout')
+                        def logout():
+                            logout_user()
+                            return redirect(url_for('index'))
+                        
+                        @app.route('/register', methods=['GET', 'POST'])
+                        def register():
+                            if current_user.is_authenticated:
+                                return redirect(url_for('index'))
+                            form = RegistrationForm()
+                            if form.validate_on_submit():
+                                user = User(username=form.username.data, email=form.email.data)
+                                user.set_password(form.password.data)
+                                db.session.add(user)
+                                db.session.commit()
+                                flash('Congratulations, you are now a registered user!')
+                                return redirect(url_for('login'))
+                            return render_template('register.html', title='Register', form=form)
+                        
+                        @app.route('/upload', methods=['GET', 'POST'])
+                        @login_required
+                        def upload():
+                            form = UploadForm()
+                            if form.validate_on_submit():
+                                song_file = form.file.data
+                                file_path = f'uploads/{song_file.filename}'
+                                song_file.save(file_path)
+                                
+                                song = Song(title=form.title.data, artist=form.artist.data, file_path=file_path)
+                                db.session.add(song)
+                                db.session.commit()
+                        
+                                flash('Song uploaded successfully!')
+                                return redirect(url_for('index'))
+                            return render_template('upload.html', title='Upload', form=form)
+                        
+                        @app.route('/download/<int:song_id>')
+                        def download(song_id):
+                            song = Song.query.get_or_404(song_id)
+                            return send_from_directory(directory='uploads', filename=song.file_path)
+                        
+                        @app.route('/about')
+                        def about():
+                            return render_template('about.html', title='About Us')
+                        
+                        @app.route('/sponsor')
+                        def sponsor():
+                            return render_template('sponsor.html', title='Sponsor')
+                        
+                        @app.route('/contact')
+                        def contact():
+                            return render_template('contact.html', title='Contact Us')
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Welcome to Black Rythme</h1>
+                                    <nav>
+                                        <a href="{{ url_for('index') }}">Home</a>
+                                        <a href="{{ url_for('about') }}">About</a>
+                                        <a href="{{ url_for('sponsor') }}">Sponsor</a>
+                                        <a href="{{ url_for('contact') }}">Contact Us</a>
+                                        {% if current_user.is_authenticated %}
+                                            <a href="{{ url_for('upload') }}">Upload</a>
+                                            <a href="{{ url_for('logout') }}">Logout</a>
+                                        {% else %}
+                                            <a href="{{ url_for('login') }}">Login</a>
+                                            <a href="{{ url_for('register') }}">Register</a>
+                                        {% endif %}
+                                    </nav>
+                                </header>
+                                <main>
+                                    <h2>Available Songs</h2>
+                                    <ul>
+                                        {% for song in songs %}
+                                            <li>{{ song.title }} by {{ song.artist }} <a href="{{ url_for('download', song_id=song.id) }}">Download</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </main>
+                            </body>
+                            </html>
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Welcome to Black Rythme</h1>
+                                    <nav>
+                                        <a href="{{ url_for('index') }}">Home</a>
+                                        <a href="{{ url_for('about') }}">About</a>
+                                        <a href="{{ url_for('sponsor') }}">Sponsor</a>
+                                        <a href="{{ url_for('contact') }}">Contact Us</a>
+                                        {% if current_user.is_authenticated %}
+                                            <a href="{{ url_for('upload') }}">Upload</a>
+                                            <a href="{{ url_for('logout') }}">Logout</a>
+                                        {% else %}
+                                            <a href="{{ url_for('login') }}">Login</a>
+                                            <a href="{{ url_for('register') }}">Register</a>
+                                        {% endif %}
+                                    </nav>
+                                </header>
+                                <main>
+                                    <h2>Available Songs</h2>
+                                    <ul>
+                                        {% for song in songs %}
+                                            <li>{{ song.title }} by {{ song.artist }} <a href="{{ url_for('download', song_id=song.id) }}">Download</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </main>
+                            </body>
+                            </html>
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Upload Song - Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Upload Song</h1>
+                                </header>
+                                <main>
+                                    <form method="POST" enctype="multipart/form-data">
+                                        {{ form.hidden_tag() }}
+                                        <p>
+                                            {{ form.title.label }}<br>
+                                            {{ form.title(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.artist.label }}<br>
+                                            {{ form.artist(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.file.label }}<br>
+                                            {{ form.file() }}
+                                        </p>
+                                        <p>{{ form.submit() }}</p>
+                                    </form>
+                                </main>
+                            </body>
+                            </html>
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Login - Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Login</h1>
+                                </header>
+                                <main>
+                                    <form method="POST">
+                                        {{ form.hidden_tag() }}
+                                        <p>
+                                            {{ form.username.label }}<br>
+                                            {{ form.username(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.password.label }}<br>
+                                            {{ form.password(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.remember_me() }} {{ form.remember_me.label }}
+                                        </p>
+                                        <p>{{ form.submit() }}</p>
+                                    </form>
+                                </main>
+                            </body>
+                            </html>
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Register - Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Register</h1>
+                                </header>
+                                <main>
+                                    <form method="POST">
+                                        {{ form.hidden_tag() }}
+                                        <p>
+                                            {{ form.username.label }}<br>
+                                            {{ form.username(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.email.label }}<br>
+                                            {{ form.email(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.password.label }}<br>
+                                            {{ form.password(size=32) }}
+                                        </p>
+                                        <p>
+                                            {{ form.password2.label }}<br>
+                                            {{ form.password2(size=32) }}
+                                        </p>
+                                        <p>{{ form.submit() }}</p>
+                                    </form>
+                                </main>
+                            </body>
+                            </html>
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>About Us - Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>About Us</h1>
+                                </header>
+                                <main>
+                                    <p>Black Rythme is a platform dedicated to showcasing the best of Nigerian rap and hip-hop. Our mission is to promote talented artists and bring their music to a global audience.</p>
+                                </main>
+                            </body>
+                            </html>
+                            <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Sponsor - Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Sponsor</h1>
+                                </header>
+                                <main>
+                                    <p>If you are interested in sponsoring Black Rythme and supporting Nigerian rap and hip-hop, please contact us.</p>
+                                </main>
+                            </body>
+                            </html>
+                             <!doctype html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="utf-8">
+                                <title>Contact Us - Black Rythme</title>
+                                <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+                            </head>
+                            <body>
+                                <header>
+                                    <h1>Contact Us</h1>
+                                </header>
+                                <main>
+                                    <p>For any inquiries or support, please reach out to us at contact@blackrythme.com.</p>
+                                </main>
+                            </body>
+                            </html>
+                                                                                                                                                                                                                                                                                                            
